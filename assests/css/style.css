@@ -1,0 +1,62 @@
+body{
+    font-family: Arial, sans-serif;
+    background-color: #f4f9f5;
+}
+header{
+    background-color: #005b2f;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    padding-bottom: 1px;
+}
+.login-container{
+    height:470px;
+   background: white;
+    color:black;
+    width: 400px;
+    border-radius:15px;
+    box-shadow: 0px 0px 10px rgb(80, 80, 80);
+    margin:40px;
+    margin-left:35%;
+    padding: 10px 20px;
+}
+.login-container h2{
+    text-align:center;
+    padding:10px;
+    padding-bottom:0px;
+    padding-top:20px;
+}
+.login-container div{
+   text-align:center;
+    padding:10px;
+    padding-bottom:0px; 
+}
+.login-container label{
+    display:block;
+    margin-bottom:5px;
+    font-weight:bold;
+    text-align:left;
+    padding-left:40px;
+}
+.login-container input,select{
+    width: 80%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.login-container button{
+    width: 80%;
+    padding: 10px;
+    background-color: #005b2f;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top:30px;
+    transition :all 0.3s ease;
+}
+
+button:hover{
+    opacity: 0.9;
+}

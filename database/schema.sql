@@ -10,7 +10,7 @@ CREATE TABLE users (
     role ENUM('admin','sales','hr') NOT NULL DEFAULT 'sales',
     status ENUM('active','inactive') NOT NULL DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+);
 
 -- 2) CUSTOMERS
 CREATE TABLE customers (
@@ -20,7 +20,7 @@ CREATE TABLE customers (
     email VARCHAR(100) unique,
     address TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+);
 
 -- 3) PRODUCTS
 CREATE TABLE products (
@@ -31,7 +31,7 @@ CREATE TABLE products (
     stock INT NOT NULL DEFAULT 0,
     description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+) ;
 
 -- 4) LEADS
 CREATE TABLE leads (
@@ -45,7 +45,7 @@ CREATE TABLE leads (
     follow_up_date DATE,
     notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+);
 
 -- 5) SALES
 CREATE TABLE sales (
@@ -61,7 +61,7 @@ CREATE TABLE sales (
     CONSTRAINT fk_sales_user
         FOREIGN KEY (created_by) REFERENCES users(user_id)
         ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB;
+) ;
 
 -- 6) SALE ITEMS
 CREATE TABLE sale_items (
@@ -77,7 +77,7 @@ CREATE TABLE sale_items (
     CONSTRAINT fk_sale_items_product
         FOREIGN KEY (product_id) REFERENCES products(product_id)
         ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB;
+) ;
 
 -- 7) INVOICES
 CREATE TABLE invoices (
@@ -89,7 +89,7 @@ CREATE TABLE invoices (
     CONSTRAINT fk_invoices_sale
         FOREIGN KEY (sale_id) REFERENCES sales(sale_id)
         ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB;
+);
 
 -- 8) EMPLOYEES
 CREATE TABLE employees (
@@ -103,7 +103,7 @@ CREATE TABLE employees (
     joining_date DATE,
     status ENUM('active','inactive') NOT NULL DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+);
 
 -- 9) ATTENDANCE
 CREATE TABLE attendance (
@@ -114,7 +114,7 @@ CREATE TABLE attendance (
     CONSTRAINT fk_attendance_employee
         FOREIGN KEY (employee_id) REFERENCES employees(employee_id)
         ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB;
+);
 
 -- 10) LEAVES
 CREATE TABLE leaves (
@@ -128,4 +128,9 @@ CREATE TABLE leaves (
     CONSTRAINT fk_leaves_employee
         FOREIGN KEY (employee_id) REFERENCES employees(employee_id)
         ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB;
+) ;
+
+--added some sample data for testing
+INSERT into users (name,email,password,role,status) values('Admin','admin@gmail.com','$2y$10$nBu.qorzLQVHdhSj/eA78./alGmtW196WCVXyjfCNrw35yD9uV5na','admin','active');
+INSERT into users (name,email,password,role,status) values('Sales','sales@gmail.com','$2y$10$QX/INyGkH.lMSsMz0LJ9Uej7nDnKH3LdyjJcyL2onKFWUxiVHhNRO','sales','active');
+INSERT into users (name,email,password,role,status) values('HR','hr@gmail.com','$2y$10$3a/NK1UkduT7RI0lEMniuOtlQfpj7rxUnM5EfsmFIaVa4N3B4Ps7m','sales','active');
