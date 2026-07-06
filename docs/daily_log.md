@@ -18,4 +18,3 @@
 - Added password hashing and verification.
 - Implemented role-based redirection (Admin, Sales, HR).
 - Created the logout functionality.
-
