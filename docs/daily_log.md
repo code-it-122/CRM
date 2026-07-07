@@ -18,3 +18,21 @@
 - Added password hashing and verification.
 - Implemented role-based redirection (Admin, Sales, HR).
 - Created the logout functionality.
+
+## Day 4
+- Completed the User Management module with full CRUD operations (Create, Read, Update, Delete).
+- Implemented secure user creation using password hashing.
+- Added delete confirmation to prevent accidental user deletion.
+- Developed the Product Management module with full CRUD operations.
+- Developed the Customer Management module with full CRUD operations.
+- Fixed issues related to prepared statements, form handling, data retrieval, and update operations.
+- Tested and verified all CRUD functionalities to ensure proper database integration.
+
+## Day 5
+- Enhanced the admin dashboard with real-time counts for Users, Products, Customers, and Employees.
+- Completed the User Management module with full CRUD operations.
+- Added delete confirmation before removing users.
+- Completed the Product Management module with full CRUD operations.
+- Completed the Customer Management module with full CRUD operations.
+- Fixed issues related to prepared statements, form handling, and update queries.
+- Tested and verified all CRUD functionalities for Users, Products, and Customers.

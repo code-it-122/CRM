@@ -217,7 +217,7 @@ table tr:hover{
     text-align:left;
     padding-left:45px;
 }
-.add-user input,select{
+.add-user input,select,textarea{
     width: 80%;
     padding: 8px;
     margin-left:15px;

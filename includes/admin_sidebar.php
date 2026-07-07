@@ -1,7 +1,7 @@
 <div class="admin_sidebar">
     <a href="../admin/view_user.php"> Users</a><br>
-    <a href="../products/view_products.php"> Products</a><br>
-    <a href="../customers/view_customers.php"> Customers</a><br>
+    <a href="../products/view_product.php"> Products</a><br>
+    <a href="../customers/view_customer.php"> Customers</a><br>
     <a href="../sales/sales_dashboard.php"> Sales</a><br>
     <a href="../billing/add_billing.php"> Billing</a><br>
     <a href="../HR/view_employee.php"> HR</a><br>

@@ -2,6 +2,31 @@
  include "../includes/header.php";
  include "../includes/footer.php";
  include "../database/db.php";
+
+if($_SERVER['REQUEST_METHOD'] == 'POST'){
+    $product_name = $_POST['product_name'];
+    $category = $_POST['category'];
+    $price = $_POST['price'];
+    $stock = $_POST['stock'];
+    $description = $_POST['description'];
+
+    $sql="insert into products (product_name,category,price,stock,description) values(?,?,?,?,?)";
+    $stmt=mysqli_prepare($conn,$sql);
+    mysqli_stmt_bind_param($stmt, "ssdis", $product_name, $category, $price, $stock, $description);
+    $result=mysqli_stmt_execute($stmt);
+
+    if($result){
+        echo "<script>alert('Product added successfully');</script>";
+        header("Location: view_product.php");
+        exit();
+    } else {
+        die("Error: " . mysqli_stmt_error($stmt));
+    }
+
+ }
+
+
+
  echo "<div class='admin-container'>";
  include "../includes/admin_sidebar.php";
  echo "<div class=\"view\">";
@@ -10,6 +35,7 @@
 
  
  echo "<h1>Products</h1><hr>";
+
  echo "<a href='add_product.php' class='add-btn'>Add Product</a>";
  echo "<table class=\"table-container\">";
 echo "<tr>
@@ -28,10 +54,9 @@ echo "<tr>
        $Product['price']."</td><td>".
        $Product['stock']."</td><td>".
        $Product['description']."</td>";
-          echo "</tr>";
-          echo "<td class=\"edit-btn\"><a href='edit_user.php?id=".$products['product_id']."'>Edit</a></td>";
+          echo "<td class=\"edit-btn\"><a href='edit_product.php?id=".$Product['product_id']."'>Edit</a></td>";
  echo "<td class=\"delete-btn\">
-        <a href='delete_user.php?id=".$products['product_id']."'
+        <a href='delete_product.php?id=".$Product['product_id']."'
            onclick=\"return confirm('Are you sure you want to delete this user?');\">
            Delete
         </a>
