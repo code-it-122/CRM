@@ -19,6 +19,7 @@ echo "<tr>
         <th>Price</th>
         <th>Stock</th>
         <th>Description</th>
+        <th colspan='2'>Actions</th>
       </tr>";
       while( $Product=mysqli_fetch_assoc($result)){
  echo "<tr><td>".$Product['product_id']."</td><td>".
@@ -28,6 +29,13 @@ echo "<tr>
        $Product['stock']."</td><td>".
        $Product['description']."</td>";
           echo "</tr>";
+          echo "<td class=\"edit-btn\"><a href='edit_user.php?id=".$products['product_id']."'>Edit</a></td>";
+ echo "<td class=\"delete-btn\">
+        <a href='delete_user.php?id=".$products['product_id']."'
+           onclick=\"return confirm('Are you sure you want to delete this user?');\">
+           Delete
+        </a>
+      </td></tr>";
       }
 
  echo "</table>";

@@ -9,7 +9,7 @@ header{
     text-align: center;
     padding-bottom: 1px;
 }
-.login-container{
+.login-container {
     height:470px;
    background: white;
     color:black;
@@ -168,9 +168,6 @@ table tr:hover{
     background-color: #e8f5e9;
 }
 
-/* ===========================
-   Action Buttons
-=========================== */
 .edit-btn,
 .delete-btn{
     text-decoration: none;
@@ -192,4 +189,55 @@ table tr:hover{
 
 .add-btn:hover{
     background-color: #256b29;
+}
+
+.add-user{
+     height:510px;
+   background: white;
+    color:black;
+    width: 345px;
+    border-radius:15px;
+    box-shadow: 0px 0px 10px rgb(80, 80, 80);
+    margin:40px;
+    margin-left:20%;
+    padding: 20px;
+    text-align:center;
+
+}
+.add-user h1{
+    text-align:center;
+    padding:10px;
+    padding-bottom:0px;
+    padding-top:0px;
+}
+.add-user label{
+    display:block;
+    margin-bottom:5px;
+    font-weight:bold;
+    text-align:left;
+    padding-left:45px;
+}
+.add-user input,select{
+    width: 80%;
+    padding: 8px;
+    margin-left:15px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.add-user button{
+    width: 80%;
+    padding: 10px;
+    margin-left:15px;
+    background-color: #005b2f;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top:30px;
+    transition :all 0.3s ease;
+}
+
+button:hover{
+    opacity: 0.9;
 }

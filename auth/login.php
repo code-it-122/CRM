@@ -77,7 +77,8 @@ if(empty($errors)){
         <div>
         <label for="role">Role :</label>
         <select id="role" name="role">
-            <option value="admin">Admin</option>
+        <option>Select role</option>    
+        <option value="admin">Admin</option>
             <option value="sales">Sales</option>
             <option value="hr">HR</option>
             </select><br><br>
