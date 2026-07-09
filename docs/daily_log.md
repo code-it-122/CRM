@@ -36,3 +36,13 @@
 - Completed the Customer Management module with full CRUD operations.
 - Fixed issues related to prepared statements, form handling, and update queries.
 - Tested and verified all CRUD functionalities for Users, Products, and Customers.
+
+## Day 6
+- Implemented the Sales module CRUD operations.
+- Developed the Add Sale functionality using the `sales` and `sale_items` tables.
+- Integrated customer and product selection using dropdowns populated from the database.
+- Calculated the total sale amount based on product price and quantity.
+- Updated product stock after each successful sale.
+- Implemented Sales Edit and Delete functionality.
+- Started extending the Edit Sale feature to update related `sale_items` data and recalculate totals.
+- Debugged issues related to PHP sessions, SQL queries, prepared statements, and form handling.

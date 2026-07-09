@@ -64,7 +64,7 @@ button:hover{
 .admin_sidebar
 {
    background-color:#005b2f;
-   height:100%;
+   height:auto;
    width:220px;
    padding-left:20px;
    color:white;
@@ -95,7 +95,7 @@ button:hover{
 
 .admin-container{
     display:flex;
-    height:90%;
+    height:auto;
     width:100%;
 }
 
@@ -192,8 +192,8 @@ table tr:hover{
 }
 
 .add-user{
-     height:510px;
-   background: white;
+    height:auto;
+   background: rgb(255, 255, 255);
     color:black;
     width: 345px;
     border-radius:15px;

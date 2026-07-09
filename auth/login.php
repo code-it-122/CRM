@@ -1,9 +1,9 @@
 <?php
+  session_start();
  include "../database/db.php";
  include "../includes/header.php";
- include "../includes/footer.php";
 
-  session_start();
+
  if(isset($_SESSION['user_id'])) {
     if($_SESSION['role']=='admin'){
         header("location: ../admin/admin_dashboard.php");
@@ -34,7 +34,7 @@ if(empty($errors)){
     $sql="select * from users where email =? AND role=? LIMIT 1";
     $stmt=mysqli_prepare($conn,$sql);
     mysqli_stmt_bind_param($stmt, "ss" ,$email ,$role);
-    mysqli_execute($stmt);
+    mysqli_stmt_execute($stmt);
     $result=mysqli_stmt_get_result($stmt);
    
 
@@ -90,3 +90,4 @@ if(empty($errors)){
             </div>
 </form>
 </div>
+<?php include "../includes/footer.php"; ?>

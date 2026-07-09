@@ -133,4 +133,4 @@ CREATE TABLE leaves (
 --added some sample data for testing
 INSERT into users (name,email,password,role,status) values('Admin','admin@gmail.com','$2y$10$nBu.qorzLQVHdhSj/eA78./alGmtW196WCVXyjfCNrw35yD9uV5na','admin','active');
 INSERT into users (name,email,password,role,status) values('Sales','sales@gmail.com','$2y$10$QX/INyGkH.lMSsMz0LJ9Uej7nDnKH3LdyjJcyL2onKFWUxiVHhNRO','sales','active');
-INSERT into users (name,email,password,role,status) values('HR','hr@gmail.com','$2y$10$3a/NK1UkduT7RI0lEMniuOtlQfpj7rxUnM5EfsmFIaVa4N3B4Ps7m','sales','active');
+INSERT into users (name,email,password,role,status) values('HR','hr@gmail.com','$2y$10$3a/NK1UkduT7RI0lEMniuOtlQfpj7rxUnM5EfsmFIaVa4N3B4Ps7m','hr','active');
