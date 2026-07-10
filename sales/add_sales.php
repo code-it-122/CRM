@@ -10,7 +10,12 @@ $result1 = mysqli_query($conn, $sql);
 ?>
 
 <div class="admin-container">
-    <?php include "../includes/admin_sidebar.php"; ?>
+    <?php if($_SESSION['role'] == 'admin'){
+    include "../includes/admin_sidebar.php";
+}
+elseif($_SESSION['role'] == 'sales'){
+    include "../includes/sales_sidebar.php";
+} ?>
 
     <div class="add-user">
         <h1>Add Sale</h1>

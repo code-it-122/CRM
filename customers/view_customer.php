@@ -26,7 +26,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 
  echo "<div class='admin-container'>";
- include "../includes/admin_sidebar.php";
+ 
+if($_SESSION['role'] == 'admin'){
+    include "../includes/admin_sidebar.php";
+}
+elseif($_SESSION['role'] == 'sales'){
+    include "../includes/sales_sidebar.php";
+}
  echo "<div class=\"view\">";
  $sql="SELECT * FROM customers";
  $result=mysqli_query($conn,$sql);

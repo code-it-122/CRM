@@ -16,7 +16,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 ?>
 
 <div class="admin-container">
-    <?php  include "../includes/admin_sidebar.php"; ?>
+   <?php
+if($_SESSION['role'] == 'admin'){
+    include "../includes/admin_sidebar.php";
+}
+elseif($_SESSION['role'] == 'sales'){
+    include "../includes/sales_sidebar.php";
+}
+?>
     <div class="add-user">
         <h1>Add Customer</h1>
         <form action="view_customer.php" method="POST">

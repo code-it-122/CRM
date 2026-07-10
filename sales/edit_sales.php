@@ -1,5 +1,4 @@
 <?php
-session_start();
 include "../database/db.php";
 include "../includes/header.php";
 
@@ -66,6 +65,12 @@ $sale_id
 );
 
 mysqli_stmt_execute($stmt);
+
+// Also update invoices total_amount if an invoice exists for this sale
+$sql_invoice = "UPDATE invoices SET total_amount = ? WHERE sale_id = ?";
+$stmt_invoice = mysqli_prepare($conn, $sql_invoice);
+mysqli_stmt_bind_param($stmt_invoice, "di", $total_amount, $sale_id);
+mysqli_stmt_execute($stmt_invoice);
 
 header("Location:view_sales.php");
 exit();

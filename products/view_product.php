@@ -1,6 +1,5 @@
 <?php
  include "../includes/header.php";
- include "../includes/footer.php";
  include "../database/db.php";
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
@@ -27,8 +26,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 
 
- echo "<div class='admin-container'>";
- include "../includes/admin_sidebar.php";
+echo "<div class='admin-container'>";
+if($_SESSION['role'] == 'admin'){
+    include "../includes/admin_sidebar.php";
+}
+elseif($_SESSION['role'] == 'sales'){
+    include "../includes/sales_sidebar.php";
+}
+elseif($_SESSION['role'] == 'hr'){
+    include "../includes/hr_sidebar.php";
+}
+
  echo "<div class=\"view\">";
  $sql="SELECT * FROM products";
  $result=mysqli_query($conn,$sql);
@@ -36,7 +44,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
  
  echo "<h1>Products</h1><hr>";
 
- echo "<a href='add_product.php' class='add-btn'>Add Product</a>";
+ if ($_SESSION['role'] == 'admin') {
+    echo "<a href='add_product.php' class='add-btn'>Add Product</a>";
+}
  echo "<table class=\"table-container\">";
 echo "<tr>
         <th>Product ID</th>
@@ -44,9 +54,12 @@ echo "<tr>
         <th>Category</th>
         <th>Price</th>
         <th>Stock</th>
-        <th>Description</th>
-        <th colspan='2'>Actions</th>
-      </tr>";
+        <th>Description</th>";
+
+       if($_SESSION['role'] == 'admin'){
+    echo "<th colspan='2'>Actions</th>";
+}
+      echo "</tr>";
       while( $Product=mysqli_fetch_assoc($result)){
  echo "<tr><td>".$Product['product_id']."</td><td>".
        $Product['product_name']."</td><td>".
@@ -54,6 +67,7 @@ echo "<tr>
        $Product['price']."</td><td>".
        $Product['stock']."</td><td>".
        $Product['description']."</td>";
+       if($_SESSION['role'] == 'admin'){
           echo "<td class=\"edit-btn\"><a href='edit_product.php?id=".$Product['product_id']."'>Edit</a></td>";
  echo "<td class=\"delete-btn\">
         <a href='delete_product.php?id=".$Product['product_id']."'
@@ -61,7 +75,7 @@ echo "<tr>
            Delete
         </a>
       </td></tr>";
-      }
+      }}
 
  echo "</table>";
  echo "</div>";

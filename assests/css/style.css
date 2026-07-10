@@ -2,12 +2,37 @@ body{
     font-family: Arial, sans-serif;
     background-color: #f4f9f5;
 }
-header{
+.header{
+    height: 70px;
     background-color: #005b2f;
     color: white;
-    padding: 10px 20px;
-    text-align: center;
-    padding-bottom: 1px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 0 30px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+}
+
+.logo h2{
+    margin: 0;
+    font-size: 28px;
+}
+
+.user-info{
+    text-align: right;
+}
+
+.user-info h3{
+    margin: 0;
+    font-size: 18px;
+}
+
+.user-info p{
+    margin: 2px 0 0;
+    font-size: 14px;
+    color: #e8f5e9;
 }
 .login-container {
     height:470px;
@@ -38,12 +63,14 @@ header{
     text-align:left;
     padding-left:40px;
 }
-.login-container input,select{
+.login-container input,
+.login-container select {
     width: 80%;
     padding: 8px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    box-sizing: border-box;
 }
 .login-container button{
     width: 80%;
@@ -61,36 +88,56 @@ button:hover{
     opacity: 0.9;
 }
 
-.admin_sidebar
-{
-   background-color:#005b2f;
-   height:auto;
-   width:220px;
-   padding-left:20px;
-   color:white;
-   border-radius: 0px 13px 13px 13px;
-
+.admin_sidebar{
+    width:220px;
+    background-color:#005b2f;
+    min-height: calc(100vh - 60px);
+    color:white;
+    border-radius:0 12px 12px 0;
+    padding-top:20px;
+    flex-shrink:0;
 }
+
 .admin_sidebar a{
     display:block;
     text-decoration:none;
     color:white;
-    padding:10px 0px;
-    transition: all 0.3s ease;
-    padding-left:50px;
+    padding:14px 20px;
+    margin:5px 10px;
+    border-radius:8px;
+    transition:all 0.3s ease;
+    font-size:15px;
+    font-weight:500;
+}
 
+.admin_sidebar a:hover{
+    background-color:rgba(255,255,255,0.15);
+    transform:translateX(5px);
+}
+
+.admin_sidebar a.active{
+    background-color:white;
+    color:#005b2f;
+    font-weight:bold;
+}
+.admin_sidebar a.active:hover {
+    padding-left: 46px;
+    background-color: rgba(255, 255, 255, 0.15);
 }
 
 .logout{
-     width: 80%;
-    padding: 10px;
+    width: 80%;
+    display: block;
+    margin: 20px auto 0;
+    margin-left: 20px;
+    padding-left: 20px;
     background-color: white;
     color:  #005b2f;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    margin-top:30px;
     transition :all 0.3s ease;
+    height:40px;
 }
 
 .admin-container{
@@ -99,8 +146,13 @@ button:hover{
     width:100%;
 }
 
-.admin-container div {
- padding-left:20px;
+.admin-container > .view{
+    flex: 1;
+    padding: 30px;
+}
+
+.admin-container div{
+    height:auto;
 }
 .cards{
     display: flex;
@@ -192,17 +244,15 @@ table tr:hover{
 }
 
 .add-user{
-    height:auto;
-   background: rgb(255, 255, 255);
-    color:black;
-    width: 345px;
-    border-radius:15px;
-    box-shadow: 0px 0px 10px rgb(80, 80, 80);
-    margin:40px;
-    margin-left:20%;
-    padding: 20px;
-    text-align:center;
-
+   height: auto;
+background: #fff;
+color: black;
+width: calc(100% - 40px);
+margin: 20px;
+padding: 20px;
+border-radius: 15px;
+box-shadow: 0px 0px 10px rgb(80, 80, 80);
+box-sizing: border-box;
 }
 .add-user h1{
     text-align:center;
@@ -215,29 +265,24 @@ table tr:hover{
     margin-bottom:5px;
     font-weight:bold;
     text-align:left;
-    padding-left:45px;
+    padding-left:0;
 }
-.add-user input,select,textarea{
-    width: 80%;
-    padding: 8px;
-    margin-left:15px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+.add-user input,
+.add-user select,
+.add-user textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    margin-left: 0;
+    box-sizing: border-box;
 }
 .add-user button{
-    width: 80%;
-    padding: 10px;
-    margin-left:15px;
-    background-color: #005b2f;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top:30px;
-    transition :all 0.3s ease;
-}
-
-button:hover{
-    opacity: 0.9;
+    width:100%;
+    padding:12px;
+    background:#005b2f;
+    color:white;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+    margin-top:20px;
 }

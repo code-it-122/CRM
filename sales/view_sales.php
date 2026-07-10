@@ -1,17 +1,12 @@
 <?php
- session_start();
  include "../database/db.php";
 
  if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $customer_id = $_POST['customer_id'];
     $product_id = $_POST['product_id'];
     $sale_date = $_POST['sale_date'];
-    
-    // Fix Error 1: Fallback checks to prevent "Undefined array key" warning
     $created_by = $_SESSION['user_id'] ?? $_SESSION['id'] ?? 1;
     $quantity = $_POST['quantity'];
-
-    // 1. Fetch the product price to calculate total amount
     $price_query = "SELECT price FROM products WHERE product_id = ?";
     $price_stmt = mysqli_prepare($conn, $price_query);
     mysqli_stmt_bind_param($price_stmt, "i", $product_id);
@@ -26,13 +21,28 @@
 
     $total_amount = $price * $quantity;
 
-    // 2. Insert only the 4 existing columns (Option B)
+
     $sql = "INSERT INTO sales (customer_id, sale_date, total_amount, created_by) VALUES (?, ?, ?, ?)";
     $stmt = mysqli_prepare($conn, $sql);
     mysqli_stmt_bind_param($stmt, "isdi", $customer_id, $sale_date, $total_amount, $created_by);
     $result = mysqli_stmt_execute($stmt);
 
     if($result){
+        $sale_id = mysqli_insert_id($conn);
+        $subtotal = $price * $quantity;
+
+        // Insert into sale_items
+        $item_sql = "INSERT INTO sale_items (sale_id, product_id, quantity, price, subtotal) VALUES (?, ?, ?, ?, ?)";
+        $item_stmt = mysqli_prepare($conn, $item_sql);
+        mysqli_stmt_bind_param($item_stmt, "iiidd", $sale_id, $product_id, $quantity, $price, $subtotal);
+        mysqli_stmt_execute($item_stmt);
+
+        // Update product stock
+        $stock_sql = "UPDATE products SET stock = stock - ? WHERE product_id = ?";
+        $stock_stmt = mysqli_prepare($conn, $stock_sql);
+        mysqli_stmt_bind_param($stock_stmt, "ii", $quantity, $product_id);
+        mysqli_stmt_execute($stock_stmt);
+
         echo "<script>
                 alert('Sale added successfully');
                 window.location.href = 'view_sales.php';
@@ -47,7 +57,12 @@
 ?>
 
 <div class='admin-container'>
- <?php include "../includes/admin_sidebar.php"; ?>
+ <?php if($_SESSION['role'] == 'admin'){
+    include "../includes/admin_sidebar.php";
+}
+elseif($_SESSION['role'] == 'sales'){
+    include "../includes/sales_sidebar.php";
+} ?>
  <div class="view">
      <?php
      $sql = "SELECT s.sale_id, c.name, s.sale_date, s.total_amount, s.created_by 
