@@ -54,3 +54,13 @@
 - Fixed sidebar alignment and layout issues across all user roles.
 - Restricted module actions based on user permissions (Admin, Sales, HR).
 - Performed final UI refinements and prepared the project for deployment.
+
+## Day 8
+- Successfully deployed the CRM project on a live server.
+- Configured the hosting environment and fixed database connection issues.
+- Verified the application functionality after deployment.
+- Implemented and tested role-based login for Admin, HR, and Sales users.
+- Completed CRUD operations for Users, Customers, Products, and Employees.
+- Added separate dashboards and access permissions according to user roles.
+- Improved the overall UI and project structure for better usability.
+- Shared the deployed project link and credentials for review.

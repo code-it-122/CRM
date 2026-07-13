@@ -62,8 +62,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             echo "<script>alert('Invalid Email or Role');</script>";
         }
     }
-    include "../includes/header.php";
 }
+include "../includes/header.php";
 ?>
 
 <div class="container d-flex align-items-center justify-content-center" style="min-height: 80vh;">

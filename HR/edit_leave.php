@@ -1,5 +1,4 @@
 <?php
-
 include "../database/db.php";
 
 // Handle post submission
@@ -22,13 +21,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     mysqli_stmt_bind_param($stmt, "isssssi", $employee_id, $leave_type, $from_date, $to_date, $reason, $status, $leave_id);
 
     if (mysqli_stmt_execute($stmt)) {
-        echo "<script>
-                alert('Leave request updated successfully');
-                window.location.href = 'view_leave.php';
-              </script>";
+        header("Location: view_leave.php");
         exit();
     } else {
-        die("Error updating leave request: " . mysqli_stmt_error($stmt));
+        echo "<script>alert('Error updating leave request');</script>";
     }
 }
 
@@ -57,52 +53,94 @@ include "../includes/header.php";
 ?>
 
 <div class="admin-container">
-    <?php 
+    <?php
     if ($_SESSION['role'] == 'admin') {
         include "../includes/admin_sidebar.php";
     } elseif ($_SESSION['role'] == 'hr') {
         include "../includes/hr_sidebar.php";
     }
     ?>
-    <div class="add-user">
-        <h1>Edit Leave Request</h1>
-        <form method="POST">
-            <input type="hidden" name="leave_id" value="<?php echo $leave['leave_id']; ?>">
-            
-            <label for="employee_id">Select Employee:</label>
-            <select name="employee_id" id="employee_id" required>
-                <option value="">Select Employee</option>
-                <?php
-                if ($employees_result && mysqli_num_rows($employees_result) > 0) {
-                    while ($row = mysqli_fetch_assoc($employees_result)) {
-                        $selected = ($row['employee_id'] == $leave['employee_id']) ? "selected" : "";
-                        echo "<option value='" . $row['employee_id'] . "' $selected>" . htmlspecialchars($row['name']) . "</option>";
-                    }
-                }
-                ?>
-            </select><br>
 
-            <label for="leave_type">Leave Type:</label>
-            <input type="text" id="leave_type" name="leave_type" value="<?php echo htmlspecialchars($leave['leave_type']); ?>" required><br>
+    <div class="view py-4 px-4">
+        <?php
+        $ph_icon = 'fa-pen-to-square';
+        $ph_title = 'Edit Leave Request';
+        $ph_subtitle = 'Update leave request details.';
+        $ph_back_link = 'view_leave.php';
+        $ph_back_label = 'Back to Leaves';
+        include "../includes/page_header.php";
+        ?>
 
-            <label for="from_date">From Date:</label>
-            <input type="date" id="from_date" name="from_date" value="<?php echo $leave['from_date']; ?>" required><br>
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm rounded-3">
+                    <div class="card-body p-4 p-md-5">
+                        <form action="edit_leave.php" method="POST">
+                            <input type="hidden" name="leave_id" value="<?php echo $leave['leave_id']; ?>">
 
-            <label for="to_date">To Date:</label>
-            <input type="date" id="to_date" name="to_date" value="<?php echo $leave['to_date']; ?>" required><br>
+                            <h6 class="text-uppercase text-muted fw-bold mb-3" style="font-size: 0.75rem; letter-spacing: 0.5px;">
+                                <i class="fa-solid fa-user me-1"></i> Employee
+                            </h6>
+                            <div class="mb-4">
+                                <label for="employee_id" class="form-label fw-semibold text-dark">Select Employee</label>
+                                <select name="employee_id" id="employee_id" class="form-select" required>
+                                    <option value="">Select Employee</option>
+                                    <?php
+                                    if ($employees_result && mysqli_num_rows($employees_result) > 0) {
+                                        while ($row = mysqli_fetch_assoc($employees_result)) {
+                                            $selected = ($row['employee_id'] == $leave['employee_id']) ? "selected" : "";
+                                            echo "<option value='" . $row['employee_id'] . "' $selected>" . htmlspecialchars($row['name']) . "</option>";
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                            </div>
 
-            <label for="reason">Reason:</label>
-            <textarea id="reason" name="reason" rows="3"><?php echo htmlspecialchars($leave['reason'] ?? ''); ?></textarea><br>
+                            <h6 class="text-uppercase text-muted fw-bold mb-3 mt-4" style="font-size: 0.75rem; letter-spacing: 0.5px;">
+                                <i class="fa-solid fa-calendar-days me-1"></i> Leave Details
+                            </h6>
+                            <div class="mb-3">
+                                <label for="leave_type" class="form-label fw-semibold text-dark">Leave Type</label>
+                                <input type="text" id="leave_type" name="leave_type" class="form-control" value="<?php echo htmlspecialchars($leave['leave_type']); ?>" required>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="from_date" class="form-label fw-semibold text-dark">From Date</label>
+                                    <input type="date" id="from_date" name="from_date" class="form-control" value="<?php echo $leave['from_date']; ?>" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="to_date" class="form-label fw-semibold text-dark">To Date</label>
+                                    <input type="date" id="to_date" name="to_date" class="form-control" value="<?php echo $leave['to_date']; ?>" required>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="reason" class="form-label fw-semibold text-dark">Reason</label>
+                                <textarea id="reason" name="reason" class="form-control" rows="3"><?php echo htmlspecialchars($leave['reason'] ?? ''); ?></textarea>
+                            </div>
 
-            <label for="status">Status:</label>
-            <select name="status" id="status" required>
-                <option value="pending" <?php if($leave['status'] == 'pending') echo 'selected'; ?>>Pending</option>
-                <option value="approved" <?php if($leave['status'] == 'approved') echo 'selected'; ?>>Approved</option>
-                <option value="rejected" <?php if($leave['status'] == 'rejected') echo 'selected'; ?>>Rejected</option>
-            </select><br>
+                            <h6 class="text-uppercase text-muted fw-bold mb-3 mt-4" style="font-size: 0.75rem; letter-spacing: 0.5px;">
+                                <i class="fa-solid fa-circle-info me-1"></i> Status
+                            </h6>
+                            <div class="mb-4">
+                                <label for="status" class="form-label fw-semibold text-dark">Leave Status</label>
+                                <select name="status" id="status" class="form-select" required>
+                                    <option value="pending" <?php if ($leave['status'] == 'pending') echo 'selected'; ?>>Pending</option>
+                                    <option value="approved" <?php if ($leave['status'] == 'approved') echo 'selected'; ?>>Approved</option>
+                                    <option value="rejected" <?php if ($leave['status'] == 'rejected') echo 'selected'; ?>>Rejected</option>
+                                </select>
+                            </div>
 
-            <button type="submit">Update Leave Request</button>
-        </form>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-success flex-fill py-2 fw-semibold">
+                                    <i class="fa-solid fa-circle-check me-2"></i>Save Changes
+                                </button>
+                                <a href="view_leave.php" class="btn btn-outline-secondary py-2 px-4">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

@@ -14,6 +14,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <a href="../customers/view_customer.php" class="<?php echo ($current_page == 'view_customer.php' || $current_page == 'add_customer.php' || $current_page == 'edit_customer.php' || $current_page == 'view_customer_details.php') ? 'active' : ''; ?>">
             <i class="fa-solid fa-handshake me-2"></i> Customers
         </a>
+                <a href="../leads/view_leads.php" class="<?php echo ($current_page == 'view_leads.php' || $current_page == 'add_lead.php' || $current_page == 'edit_lead.php') ? 'active' : ''; ?>">
+            <i class="fa-solid fa-bullseye me-2"></i> Leads
+        </a>
         <a href="../products/view_product.php" class="<?php echo ($current_page == 'view_product.php' || $current_page == 'add_product.php' || $current_page == 'edit_product.php') ? 'active' : ''; ?>">
             <i class="fa-solid fa-box-open me-2"></i> Products
         </a>

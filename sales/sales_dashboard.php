@@ -198,7 +198,7 @@ if (empty($chart_products)) {
                                         echo "<td>" . $s_row['sale_id'] . "</td>";
                                         echo "<td>" . htmlspecialchars($s_row['customer_name']) . "</td>";
                                         echo "<td>" . $s_row['sale_date'] . "</td>";
-                                        echo "<td class='fw-bold text-success'>$" . number_format($s_row['total_amount'], 2) . "</td>";
+                                        echo "<td class='fw-bold text-success'>Rs " . number_format($s_row['total_amount'], 2) . "</td>";
                                         echo "</tr>";
                                     }
                                 } else {

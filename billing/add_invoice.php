@@ -57,41 +57,77 @@ elseif($_SESSION['role'] == 'sales'){
     include "../includes/sales_sidebar.php";
 } ?>
 
-    <div class="add-user">
-        <h1>Add Invoice</h1>
-        <form action="add_invoice.php" method="POST">
-            
-            <label for="sale_id">Select Sale ID</label>
-            <select name="sale_id" id="sale_id" required>
-                <option value="" data-amount="0.00" data-products="None">Select Sale</option>
-                <?php
-                while ($sale = mysqli_fetch_assoc($sales_result)) {
-                    $products = !empty($sale['products_list']) ? htmlspecialchars($sale['products_list']) : 'No products';
-                    echo "<option value='" . $sale['sale_id'] . "' data-amount='" . $sale['total_amount'] . "' data-products='" . $products . "'>";
-                    echo "Sale #" . $sale['sale_id'] . " - " . htmlspecialchars($sale['customer_name']) . " ($" . number_format($sale['total_amount'], 2) . ")";
-                    echo "</option>";
-                }
-                ?>
-            </select>
+    <div class="view py-4 px-4">
+        <?php
+        $ph_icon = 'fa-file-invoice';
+        $ph_title = 'Add Invoice';
+        $ph_subtitle = 'Generate a new invoice for a sale.';
+        $ph_back_link = 'view_invoice.php';
+        $ph_back_label = 'Back to Invoices';
+        include "../includes/page_header.php";
+        ?>
 
-            <label for="total_amount_display">Total Amount</label>
-            <input type="text" id="total_amount_display" readonly value="$0.00">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm rounded-3">
+                    <div class="card-body p-4 p-md-5">
+                        <form action="add_invoice.php" method="POST">
 
-            <label for="products_display">Included Products & Quantity</label>
-            <input type="text" id="products_display" readonly value="None">
+                            <h6 class="text-uppercase text-muted fw-bold mb-3" style="font-size: 0.75rem; letter-spacing: 0.5px;">
+                                <i class="fa-solid fa-cart-shopping me-1"></i> Sale Details
+                            </h6>
+                            <div class="mb-3">
+                                <label for="sale_id" class="form-label fw-semibold text-dark">Select Sale ID</label>
+                                <select name="sale_id" id="sale_id" class="form-select" required>
+                                    <option value="" data-amount="0.00" data-products="None">Select Sale</option>
+                                    <?php
+                                    while ($sale = mysqli_fetch_assoc($sales_result)) {
+                                        $products = !empty($sale['products_list']) ? htmlspecialchars($sale['products_list']) : 'No products';
+                                        echo "<option value='" . $sale['sale_id'] . "' data-amount='" . $sale['total_amount'] . "' data-products='" . $products . "'>";
+                                        echo "Sale #" . $sale['sale_id'] . " - " . htmlspecialchars($sale['customer_name']) . " ($" . number_format($sale['total_amount'], 2) . ")";
+                                        echo "</option>";
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="total_amount_display" class="form-label fw-semibold text-dark">Total Amount</label>
+                                <input type="text" id="total_amount_display" class="form-control" readonly value="$0.00">
+                            </div>
+                            <div class="mb-3">
+                                <label for="products_display" class="form-label fw-semibold text-dark">Included Products &amp; Quantity</label>
+                                <input type="text" id="products_display" class="form-control" readonly value="None">
+                            </div>
 
-            <label for="invoice_date">Invoice Date</label>
-            <input type="date" name="invoice_date" id="invoice_date" value="<?php echo date('Y-m-d'); ?>" required>
+                            <h6 class="text-uppercase text-muted fw-bold mb-3 mt-4" style="font-size: 0.75rem; letter-spacing: 0.5px;">
+                                <i class="fa-solid fa-file-invoice-dollar me-1"></i> Invoice Details
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <label for="invoice_date" class="form-label fw-semibold text-dark">Invoice Date</label>
+                                    <input type="date" name="invoice_date" id="invoice_date" class="form-control" value="<?php echo date('Y-m-d'); ?>" required>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <label for="payment_status" class="form-label fw-semibold text-dark">Payment Status</label>
+                                    <select name="payment_status" id="payment_status" class="form-select" required>
+                                        <option value="pending">Pending</option>
+                                        <option value="partial">Partial</option>
+                                        <option value="paid">Paid</option>
+                                    </select>
+                                </div>
+                            </div>
 
-            <label for="payment_status">Payment Status</label>
-            <select name="payment_status" id="payment_status" required>
-                <option value="pending">Pending</option>
-                <option value="partial">Partial</option>
-                <option value="paid">Paid</option>
-            </select>
-
-            <button type="submit">Generate Invoice</button>
-        </form>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-success flex-fill py-2 fw-semibold">
+                                    <i class="fa-solid fa-circle-check me-2"></i>Generate Invoice
+                                </button>
+                                <a href="view_invoice.php" class="btn btn-outline-secondary py-2 px-4">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
