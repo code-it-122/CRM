@@ -2,6 +2,11 @@
  include "../includes/header.php";
  include "../database/db.php";
 
+ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+     header("Location: ../auth/login.php");
+     exit();
+ }
+
  if($_SERVER['REQUEST_METHOD'] == 'GET'){
     $id=$_GET['id'];   
      $sql = "SELECT * FROM users WHERE user_id=?";
@@ -10,6 +15,11 @@
      mysqli_stmt_execute($stmt);
      $result=mysqli_stmt_get_result($stmt);
      $user=mysqli_fetch_assoc($result);
+
+     if (!$user) {
+         echo "<script>alert('User not found.'); window.location.href='view_user.php';</script>";
+         exit();
+     }
 
      $name=$user['name'];
      $email=$user['email'];
@@ -44,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         header("Location: view_user.php");
         exit();
     } else {
-        echo "Error: " . mysqli_stmt_error($stmt);
+        echo "<script>alert('Error updating user.');</script>";
     }
 }
 ?>
@@ -89,8 +99,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                     <label for="role" class="form-label fw-semibold text-dark">Role</label>
                                     <select name="role" class="form-select" required>
                                         <option value="admin" <?php if($user['role'] == 'admin') echo 'selected'; ?>>Admin</option>
-                                        <option value="employee" <?php if($user['role'] == 'employee') echo 'selected'; ?>>Employee</option>
-                                        <option value="customer" <?php if($user['role'] == 'customer') echo 'selected'; ?>>Customer</option>
+                                        <option value="sales" <?php if($user['role'] == 'sales') echo 'selected'; ?>>Sales</option>
+                                        <option value="hr" <?php if($user['role'] == 'hr') echo 'selected'; ?>>HR</option>
                                     </select>
                                 </div>
                                 <div class="col-md-6 mb-4">

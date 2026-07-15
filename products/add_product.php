@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             </h6>
                             <div class="row">
                                 <div class="col-md-6 mb-4">
-                                    <label for="price" class="form-label fw-semibold text-dark">Price ($)</label>
+                                    <label for="price" class="form-label fw-semibold text-dark">Price (Rs)</label>
                                     <input type="number" step="0.01" min="0" id="price" name="price" class="form-control" placeholder="0.00" required>
                                 </div>
                                 <div class="col-md-6 mb-4">

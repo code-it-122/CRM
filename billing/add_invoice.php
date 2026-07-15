@@ -1,11 +1,27 @@
 <?php
 include "../database/db.php";
 
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'sales'])) {
+    header("Location: ../auth/login.php");
+    exit();
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $sale_id = $_POST['sale_id'];
+    $sale_id = intval($_POST['sale_id']);
     $invoice_date = $_POST['invoice_date'];
     $payment_status = $_POST['payment_status'];
-    
+
+    // Guard: make sure this sale doesn't already have an invoice (sale_id is UNIQUE in invoices)
+    $check = mysqli_prepare($conn, "SELECT invoice_id FROM invoices WHERE sale_id = ?");
+    mysqli_stmt_bind_param($check, "i", $sale_id);
+    mysqli_stmt_execute($check);
+    mysqli_stmt_store_result($check);
+
+    if (mysqli_stmt_num_rows($check) > 0) {
+        echo "<script>alert('An invoice already exists for this sale.'); window.history.back();</script>";
+        exit();
+    }
+
     // Fetch total_amount directly from sales database to be secure
     $sql = "SELECT total_amount FROM sales WHERE sale_id = ?";
     $stmt = mysqli_prepare($conn, $sql);
@@ -31,20 +47,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
               </script>";
         exit();
     } else {
-        die("Error: " . mysqli_stmt_error($stmt));
+        echo "<script>alert('Error generating invoice. Please try again.'); window.history.back();</script>";
+        exit();
     }
 }
 
-// Fetch all sales for dropdown selection
+// Only show sales that do NOT already have an invoice
 $sales_query = "SELECT s.sale_id, s.total_amount, c.name AS customer_name,
                 GROUP_CONCAT(CONCAT(p.product_name, ' (x', si.quantity, ')') SEPARATOR ', ') AS products_list
                 FROM sales s 
                 JOIN customers c ON s.customer_id = c.customer_id
                 LEFT JOIN sale_items si ON s.sale_id = si.sale_id
                 LEFT JOIN products p ON si.product_id = p.product_id
+                WHERE s.sale_id NOT IN (SELECT sale_id FROM invoices)
                 GROUP BY s.sale_id
                 ORDER BY s.sale_id DESC";
 $sales_result = mysqli_query($conn, $sales_query);
+$sales_available = mysqli_num_rows($sales_result);
 
 include "../includes/header.php";
 ?>
@@ -67,6 +86,18 @@ elseif($_SESSION['role'] == 'sales'){
         include "../includes/page_header.php";
         ?>
 
+        <?php if ($sales_available == 0): ?>
+            <div class="card border-0 shadow-sm rounded-3">
+                <?php
+                $es_icon = 'fa-file-invoice';
+                $es_title = 'No sales available to invoice';
+                $es_desc = 'Every recorded sale already has an invoice, or no sales have been made yet.';
+                $es_action_link = '../sales/view_sales.php';
+                $es_action_label = 'Go to Sales';
+                include "../includes/empty_state.php";
+                ?>
+            </div>
+        <?php else: ?>
         <div class="row justify-content-center">
             <div class="col-lg-7">
                 <div class="card border-0 shadow-sm rounded-3">
@@ -128,12 +159,12 @@ elseif($_SESSION['role'] == 'sales'){
                 </div>
             </div>
         </div>
+        <?php endif; ?>
     </div>
 </div>
 
 <script>
-// Automatically update the total amount and products fields when the Sale ID changes
-document.getElementById('sale_id').addEventListener('change', function() {
+document.getElementById('sale_id')?.addEventListener('change', function() {
     var selectedOption = this.options[this.selectedIndex];
     var amount = selectedOption.getAttribute('data-amount') || '0.00';
     var products = selectedOption.getAttribute('data-products') || 'None';

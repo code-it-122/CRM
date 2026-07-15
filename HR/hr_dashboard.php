@@ -1,4 +1,10 @@
 <?php
+session_start();
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'hr'])) {
+    header("Location: ../auth/login.php");
+    exit();
+}
+
 include "../database/db.php";
 
 // Fetch counts
@@ -60,7 +66,6 @@ include "../includes/header.php";
 
         <!-- Stat Cards -->
         <div class="row g-4 mb-4">
-            <!-- Total Employees -->
             <div class="col-md-6 col-lg-3">
                 <div class="card border-0 shadow-sm h-100 rounded-3 overflow-hidden border-start border-primary border-4 card-animate">
                     <div class="card-body p-4 d-flex align-items-center justify-content-between">
@@ -75,7 +80,6 @@ include "../includes/header.php";
                 </div>
             </div>
 
-            <!-- Active Employees -->
             <div class="col-md-6 col-lg-3">
                 <div class="card border-0 shadow-sm h-100 rounded-3 overflow-hidden border-start border-success border-4 card-animate">
                     <div class="card-body p-4 d-flex align-items-center justify-content-between">
@@ -90,7 +94,6 @@ include "../includes/header.php";
                 </div>
             </div>
 
-            <!-- Inactive Employees -->
             <div class="col-md-6 col-lg-3">
                 <div class="card border-0 shadow-sm h-100 rounded-3 overflow-hidden border-start border-danger border-4 card-animate">
                     <div class="card-body p-4 d-flex align-items-center justify-content-between">
@@ -105,7 +108,6 @@ include "../includes/header.php";
                 </div>
             </div>
 
-            <!-- Pending Leaves -->
             <div class="col-md-6 col-lg-3">
                 <div class="card border-0 shadow-sm h-100 rounded-3 overflow-hidden border-start border-warning border-4 card-animate">
                     <div class="card-body p-4 d-flex align-items-center justify-content-between">

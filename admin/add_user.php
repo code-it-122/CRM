@@ -2,18 +2,10 @@
  include "../includes/header.php";
  include "../database/db.php";
 
-if($_SERVER['REQUEST_METHOD'] == 'POST'){
-    $username = $_POST['username'];
-    $email = $_POST['email'];
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-    $role = $_POST['role'];
-    $status = $_POST['status'];
-
-    if(empty($username) || empty($email) || empty($password) || empty($role) || empty($status)){
-        echo "<script>alert('Please fill all the required fields');</script>";
-    } 
+ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+     header("Location: ../auth/login.php");
+     exit();
  }
-
 ?>
 
 <div class="admin-container">
@@ -59,17 +51,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                                     <label for="role" class="form-label fw-semibold text-dark">Role</label>
                                     <select id="role" name="role" class="form-select" required>
                                         <option value="">Select Role</option>
-                                        <option value="admin">admin</option>
-                                        <option value="Sales">sales</option>
-                                        <option value="HR">hr</option>
+                                        <option value="admin">Admin</option>
+                                        <option value="sales">Sales</option>
+                                        <option value="hr">HR</option>
                                     </select>
                                 </div>
                                 <div class="col-md-6 mb-4">
                                     <label for="status" class="form-label fw-semibold text-dark">Status</label>
                                     <select id="status" name="status" class="form-select" required>
                                         <option value="">Select Status</option>
-                                        <option value="active">active</option>
-                                        <option value="inactive">inactive</option>
+                                        <option value="active">Active</option>
+                                        <option value="inactive">Inactive</option>
                                     </select>
                                 </div>
                             </div>

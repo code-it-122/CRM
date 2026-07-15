@@ -1,7 +1,11 @@
 <?php
 
-
 include "../database/db.php";
+
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'hr'])) {
+    header("Location: ../auth/login.php");
+    exit();
+}
 
 if (isset($_GET['id'])) {
     $id = intval($_GET['id']);
@@ -18,7 +22,8 @@ if (isset($_GET['id'])) {
                   </script>";
             exit();
         } else {
-            die("Error deleting leave request: " . mysqli_stmt_error($stmt));
+            echo "<script>alert('Error deleting leave request.'); window.location.href='view_leave.php';</script>";
+            exit();
         }
     }
 } else {

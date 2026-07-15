@@ -12,7 +12,7 @@ if (isset($_SESSION['user_id'])) {
         exit();
     }
     if ($_SESSION['role'] == 'hr') {
-        header("location: ../hr/hr_dashboard.php");
+        header("location: ../HR/hr_dashboard.php");
         exit();
     }       
 }
@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     exit();
                 }
                 elseif ($_SESSION['role'] == 'hr') {
-                    header("Location: ../hr/hr_dashboard.php");
+                    header("Location: ../HR/hr_dashboard.php");
                     exit();
                 }
             } else {

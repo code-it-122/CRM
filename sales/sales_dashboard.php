@@ -134,7 +134,7 @@ if (empty($chart_products)) {
                     <div class="card-body p-4 d-flex align-items-center justify-content-between">
                         <div>
                             <h6 class="text-uppercase text-muted mb-1" style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px;">Revenue Generated</h6>
-                            <h3 class="mb-0 text-dark fw-bold">$<?php echo number_format($total_revenue, 2); ?></h3>
+                            <h3 class="mb-0 text-dark fw-bold">Rs<?php echo number_format($total_revenue, 2); ?></h3>
                         </div>
                         <div class="bg-success bg-opacity-10 text-success rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
                             <i class="fa-solid fa-sack-dollar fa-lg"></i>
@@ -261,7 +261,7 @@ document.addEventListener('DOMContentLoaded', function() {
         data: {
             labels: <?php echo json_encode($chart_months); ?>,
             datasets: [{
-                label: 'Sales Revenue ($)',
+                label: 'Sales Revenue (Rs)',
                 data: <?php echo json_encode($chart_sales_amounts); ?>,
                 borderColor: '#198754',
                 backgroundColor: 'rgba(25, 135, 84, 0.05)',

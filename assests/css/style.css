@@ -188,3 +188,12 @@ body {
     border-color: var(--primary-green) !important;
     color: #ffffff !important;
 }
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+    }
+
+    .content {
+        margin-left: 0;
+    }
+}

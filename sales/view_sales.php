@@ -2,6 +2,78 @@
 include "../includes/header.php";
 include "../database/db.php";
 
+// Auth guard
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'sales'])) {
+    header("Location: ../auth/login.php");
+    exit();
+}
+
+// Handle sale submission
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['customer_id'])) {
+    $customer_id = intval($_POST['customer_id']);
+    $product_id  = intval($_POST['product_id']);
+    $quantity    = intval($_POST['quantity']);
+    $sale_date   = $_POST['sale_date'];
+
+    if ($customer_id <= 0 || $product_id <= 0 || $quantity < 1 || empty($sale_date)) {
+        echo "<script>alert('Please fill all the required fields correctly.');</script>";
+    } else {
+        // Lock-read the product to check live stock/price
+        $sql = "SELECT price, stock FROM products WHERE product_id = ?";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, "i", $product_id);
+        mysqli_stmt_execute($stmt);
+        $product = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+
+        if (!$product) {
+            echo "<script>alert('Selected product no longer exists.');</script>";
+        } elseif ($quantity > $product['stock']) {
+            echo "<script>alert('Cannot sell more than available stock. Only " . $product['stock'] . " left.');</script>";
+        } else {
+            $price = $product['price'];
+            $total_amount = $price * $quantity;
+            $created_by = $_SESSION['user_id'];
+
+            mysqli_begin_transaction($conn);
+            $ok = true;
+
+            try {
+                $sql = "INSERT INTO sales (customer_id, sale_date, total_amount, created_by) VALUES (?, ?, ?, ?)";
+                $stmt = mysqli_prepare($conn, $sql);
+                mysqli_stmt_bind_param($stmt, "isdi", $customer_id, $sale_date, $total_amount, $created_by);
+                mysqli_stmt_execute($stmt);
+                $sale_id = mysqli_insert_id($conn);
+
+                $sql = "INSERT INTO sale_items (sale_id, product_id, quantity, price, subtotal) VALUES (?, ?, ?, ?, ?)";
+                $stmt = mysqli_prepare($conn, $sql);
+                mysqli_stmt_bind_param($stmt, "iiidd", $sale_id, $product_id, $quantity, $price, $total_amount);
+                mysqli_stmt_execute($stmt);
+
+                // Atomic stock deduction — the "AND stock >= ?" guards against a race condition
+                $sql = "UPDATE products SET stock = stock - ? WHERE product_id = ? AND stock >= ?";
+                $stmt = mysqli_prepare($conn, $sql);
+                mysqli_stmt_bind_param($stmt, "iii", $quantity, $product_id, $quantity);
+                mysqli_stmt_execute($stmt);
+
+                if (mysqli_stmt_affected_rows($stmt) === 0) {
+                    throw new Exception('stock_conflict');
+                }
+            } catch (Exception $e) {
+                $ok = false;
+            }
+
+            if ($ok) {
+                mysqli_commit($conn);
+                echo "<script>alert('Sale recorded successfully'); window.location.href='view_sales.php';</script>";
+                exit();
+            } else {
+                mysqli_rollback($conn);
+                echo "<script>alert('Could not complete the sale — stock may have just changed. Please try again.');</script>";
+            }
+        }
+    }
+}
+
 $sql = "SELECT * FROM customers";
 $result = mysqli_query($conn, $sql);
 $customer_count = mysqli_num_rows($result);
@@ -68,8 +140,9 @@ elseif($_SESSION['role'] == 'sales'){
                                 <option value="">Select Product</option>
                                 <?php
                                 while($prod = mysqli_fetch_assoc($result1)){
-                                    echo "<option value='".$prod['product_id']."' data-price='".$prod['price']."' data-stock='".$prod['stock']."'>"
-                                        .htmlspecialchars($prod['product_name'])." — Rs".number_format($prod['price'],2)." (Stock: ".$prod['stock'].")"
+                                    $disabled = $prod['stock'] <= 0 ? "disabled" : "";
+                                    echo "<option value='".$prod['product_id']."' data-price='".$prod['price']."' data-stock='".$prod['stock']."' $disabled>"
+                                        .htmlspecialchars($prod['product_name'])." — Rs. ".number_format($prod['price'],2)." (Stock: ".$prod['stock'].($prod['stock']<=0 ? ' — Out of Stock' : '').")"
                                         ."</option>";
                                 }
                                 ?>
@@ -102,7 +175,7 @@ elseif($_SESSION['role'] == 'sales'){
                     <h5 class="fw-bold mb-3 text-dark"><i class="fa-solid fa-receipt text-success me-2"></i>Order Summary</h5>
                     <div class="d-flex justify-content-between border-bottom pb-2 mb-2">
                         <span class="text-muted">Unit Price</span>
-                        <span class="fw-semibold" id="summaryPrice">Rs0.00</span>
+                        <span class="fw-semibold" id="summaryPrice">Rs 0.00</span>
                     </div>
                     <div class="d-flex justify-content-between border-bottom pb-2 mb-2">
                         <span class="text-muted">Available Stock</span>
@@ -114,7 +187,7 @@ elseif($_SESSION['role'] == 'sales'){
                     </div>
                     <div class="d-flex justify-content-between pt-2">
                         <span class="fw-bold text-dark">Estimated Total</span>
-                        <span class="fw-bold text-success fs-5" id="summaryTotal">Rs0.00</span>
+                        <span class="fw-bold text-success fs-5" id="summaryTotal">Rs 0.00</span>
                     </div>
                     <small class="text-muted mt-3"><i class="fa-solid fa-circle-info me-1"></i>Final total is calculated and saved automatically on submit.</small>
                 </div>
@@ -128,6 +201,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const productSelect = document.getElementById('product_id');
     const quantityInput = document.getElementById('quantity');
     const stockWarning = document.getElementById('stockWarning');
+    const submitBtn = document.querySelector('#addSaleForm button[type="submit"]');
 
     const summaryPrice = document.getElementById('summaryPrice');
     const summaryStock = document.getElementById('summaryStock');
@@ -140,16 +214,14 @@ document.addEventListener('DOMContentLoaded', function () {
         const stock = parseInt(selected?.getAttribute('data-stock')) || 0;
         const qty = parseInt(quantityInput.value) || 0;
 
-        summaryPrice.textContent = 'Rs' + price.toFixed(2);
+        summaryPrice.textContent = 'Rs ' + price.toFixed(2);
         summaryStock.textContent = selected && selected.value ? stock : '—';
         summaryQty.textContent = qty;
-        summaryTotal.textContent = 'Rs' + (price * qty).toFixed(2);
+        summaryTotal.textContent = 'Rs ' + (price * qty).toFixed(2);
 
-        if (selected && selected.value && qty > stock) {
-            stockWarning.classList.remove('d-none');
-        } else {
-            stockWarning.classList.add('d-none');
-        }
+        const overselling = selected && selected.value && qty > stock;
+        stockWarning.classList.toggle('d-none', !overselling);
+        if (submitBtn) submitBtn.disabled = overselling;
     }
 
     productSelect.addEventListener('change', updateSummary);

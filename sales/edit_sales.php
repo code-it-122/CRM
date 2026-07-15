@@ -2,78 +2,102 @@
 include "../database/db.php";
 include "../includes/header.php";
 
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'sales'])) {
+    header("Location: ../auth/login.php");
+    exit();
+}
+
 // 1. Handle Form Submission (POST)
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $sale_id = $_POST['sale_id'];
-$customer_id = $_POST['customer_id'];
-$product_id = $_POST['product_id'];
-$quantity = $_POST['quantity'];
-$sale_date = $_POST['sale_date'];
+    $sale_id = intval($_POST['sale_id']);
+    $customer_id = intval($_POST['customer_id']);
+    $product_id = intval($_POST['product_id']);
+    $quantity = intval($_POST['quantity']);
+    $sale_date = $_POST['sale_date'];
 
-// Get latest product price
-$sql = "SELECT price FROM products WHERE product_id=?";
-$stmt = mysqli_prepare($conn,$sql);
-mysqli_stmt_bind_param($stmt,"i",$product_id);
-mysqli_stmt_execute($stmt);
+    // Fetch the OLD sale item so we know what stock to restore
+    $sql = "SELECT product_id, quantity FROM sale_items WHERE sale_id = ? LIMIT 1";
+    $stmt = mysqli_prepare($conn, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $sale_id);
+    mysqli_stmt_execute($stmt);
+    $old_item = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
 
-$result=mysqli_stmt_get_result($stmt);
-$product=mysqli_fetch_assoc($result);
+    if (!$old_item) {
+        echo "<script>alert('Original sale record not found.'); window.history.back();</script>";
+        exit();
+    }
 
-$price=$product['price'];
-$total_amount=$price*$quantity;
+    $old_product_id = $old_item['product_id'];
+    $old_quantity = $old_item['quantity'];
 
-// Update sales
-$sql="UPDATE sales
-SET customer_id=?,
-sale_date=?,
-total_amount=?
-WHERE sale_id=?";
+    mysqli_begin_transaction($conn);
+    $ok = true;
 
-$stmt=mysqli_prepare($conn,$sql);
+    try {
+        // Step 1: restore stock to the OLD product
+        $sql = "UPDATE products SET stock = stock + ? WHERE product_id = ?";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, "ii", $old_quantity, $old_product_id);
+        mysqli_stmt_execute($stmt);
 
-mysqli_stmt_bind_param(
-$stmt,
-"isdi",
-$customer_id,
-$sale_date,
-$total_amount,
-$sale_id
-);
+        // Step 2: verify enough stock exists on the NEW product (after restoring, in case it's the same product)
+        $sql = "SELECT price, stock FROM products WHERE product_id = ?";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, "i", $product_id);
+        mysqli_stmt_execute($stmt);
+        $product = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
 
-mysqli_stmt_execute($stmt);
+        if (!$product || $quantity > $product['stock']) {
+            throw new Exception('insufficient_stock');
+        }
 
-// Update sale_items
-$subtotal=$price*$quantity;
+        $price = $product['price'];
+        $total_amount = $price * $quantity;
 
-$sql="UPDATE sale_items
-SET product_id=?,
-quantity=?,
-price=?,
-subtotal=?
-WHERE sale_id=?";
+        // Step 3: deduct new quantity from the NEW product (atomic guard)
+        $sql = "UPDATE products SET stock = stock - ? WHERE product_id = ? AND stock >= ?";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, "iii", $quantity, $product_id, $quantity);
+        mysqli_stmt_execute($stmt);
+        if (mysqli_stmt_affected_rows($stmt) === 0) {
+            throw new Exception('stock_conflict');
+        }
 
-$stmt=mysqli_prepare($conn,$sql);
+        // Step 4: update sales
+        $sql = "UPDATE sales SET customer_id=?, sale_date=?, total_amount=? WHERE sale_id=?";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, "isdi", $customer_id, $sale_date, $total_amount, $sale_id);
+        mysqli_stmt_execute($stmt);
 
-mysqli_stmt_bind_param(
-$stmt,
-"iiddi",
-$product_id,
-$quantity,
-$price,
-$subtotal,
-$sale_id
-);
+        // Step 5: update sale_items
+        $sql = "UPDATE sale_items SET product_id=?, quantity=?, price=?, subtotal=? WHERE sale_id=?";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, "iiddi", $product_id, $quantity, $price, $total_amount, $sale_id);
+        mysqli_stmt_execute($stmt);
 
-mysqli_stmt_execute($stmt);
+        // Step 6: keep invoice total in sync if one exists
+        $sql = "UPDATE invoices SET total_amount = ? WHERE sale_id = ?";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, "di", $total_amount, $sale_id);
+        mysqli_stmt_execute($stmt);
 
-// Also update invoices total_amount if an invoice exists for this sale
-$sql_invoice = "UPDATE invoices SET total_amount = ? WHERE sale_id = ?";
-$stmt_invoice = mysqli_prepare($conn, $sql_invoice);
-mysqli_stmt_bind_param($stmt_invoice, "di", $total_amount, $sale_id);
-mysqli_stmt_execute($stmt_invoice);
+    } catch (Exception $e) {
+        $ok = false;
+        $error_reason = $e->getMessage();
+    }
 
-header("Location:view_sales.php");
-exit();
+    if ($ok) {
+        mysqli_commit($conn);
+        header("Location: view_sales.php");
+        exit();
+    } else {
+        mysqli_rollback($conn);
+        $msg = ($error_reason === 'insufficient_stock')
+            ? 'Not enough stock available for the selected product/quantity.'
+            : 'Could not update the sale. Please try again.';
+        echo "<script>alert('" . $msg . "'); window.history.back();</script>";
+        exit();
+    }
 }
 
 if(isset($_GET['id'])){
@@ -89,6 +113,11 @@ if(isset($_GET['id'])){
     $result = mysqli_stmt_get_result($stmt);
     $sale = mysqli_fetch_assoc($result);
 
+    if (!$sale) {
+        echo "<script>alert('Sale not found.'); window.location.href='view_sales.php';</script>";
+        exit();
+    }
+
     // Fetch sale item
     $sql = "SELECT * FROM sale_items WHERE sale_id=?";
     $stmt = mysqli_prepare($conn,$sql);
@@ -103,11 +132,18 @@ if(isset($_GET['id'])){
 
     // Products
     $products_result = mysqli_query($conn,"SELECT * FROM products");
+} else {
+    header("Location: view_sales.php");
+    exit();
 }
 ?>
 
 <div class="admin-container">
-    <?php include "../includes/admin_sidebar.php"; ?>
+    <?php if($_SESSION['role'] == 'admin'){
+        include "../includes/admin_sidebar.php";
+    } elseif($_SESSION['role'] == 'sales'){
+        include "../includes/sales_sidebar.php";
+    } ?>
     <div class="add-user">
         <h1>Edit Sale</h1>
         <form action="edit_sales.php" method="POST">
@@ -121,35 +157,37 @@ if(isset($_GET['id'])){
                 <?php
                 while ($cust = mysqli_fetch_assoc($customers_result)) {
                     $selected = ($cust['customer_id'] == $sale['customer_id']) ? "selected" : "";
-                    echo "<option value='" . $cust['customer_id'] . "' $selected>" . $cust['name'] . "</option>";
+                    echo "<option value='" . $cust['customer_id'] . "' $selected>" . htmlspecialchars($cust['name']) . "</option>";
                 }
                 ?>
             </select><br>
 
             <label for="product_id">Product:</label>
-<select name="product_id" required>
+            <select name="product_id" id="product_id" required>
+                <option value="">Select Product</option>
+                <?php
+                while($prod=mysqli_fetch_assoc($products_result)){
+                    $selected = ($prod['product_id']==$sale_item['product_id']) ? "selected" : "";
+                    // Show effective stock: current stock + what THIS sale already holds (since it will be restored on save)
+                    $effective_stock = $prod['stock'] + ($prod['product_id'] == $sale_item['product_id'] ? $sale_item['quantity'] : 0);
+                    echo "<option value='".$prod['product_id']."' ".$selected.">".htmlspecialchars($prod['product_name'])." (Available: ".$effective_stock.")</option>";
+                }
+                ?>
+            </select><br>
 
-<option value="">Select Product</option>
+            <label for="quantity">Quantity:</label>
+            <input
+            type="number"
+            name="quantity"
+            id="quantity"
+            min="1"
+            value="<?php echo $sale_item['quantity']; ?>"
+            required><br>
 
-<?php
-while($prod=mysqli_fetch_assoc($products_result)){
-    $selected = ($prod['product_id']==$sale_item['product_id']) ? "selected" : "";
-    echo "<option value='".$prod['product_id']."' ".$selected.">".$prod['product_name']."</option>";
-}
-?>
-
-</select><br>
-<label for="quantity">Quantity:</label>
-<input
-type="number"
-name="quantity"
-value="<?php echo $sale_item['quantity']; ?>"
-required><br>
             <!-- Sale Date -->
             <label for="sale_date">Sale Date:</label>
             <input type="date" id="sale_date" name="sale_date" value="<?php echo $sale['sale_date']; ?>" required><br>
 
-           
             <button type="submit">Edit Sale</button>
         </form>
     </div>
