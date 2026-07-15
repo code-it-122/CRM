@@ -1,5 +1,4 @@
 <?php
-include "../includes/header.php";
 include "../database/db.php";
 
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
@@ -38,6 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo "<script>alert('Error updating customer');</script>";
     }
 }
+include "../includes/header.php";
 ?>
 
 <div class="admin-container">

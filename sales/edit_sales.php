@@ -1,4 +1,5 @@
 <?php
+ob_start();
 include "../database/db.php";
 include "../includes/header.php";
 
@@ -144,52 +145,86 @@ if(isset($_GET['id'])){
     } elseif($_SESSION['role'] == 'sales'){
         include "../includes/sales_sidebar.php";
     } ?>
-    <div class="add-user">
-        <h1>Edit Sale</h1>
-        <form action="edit_sales.php" method="POST">
-            <!-- Hidden Sale ID -->
-            <input type="hidden" name="sale_id" value="<?php echo $sale['sale_id']; ?>">
 
-            <!-- Customer -->
-            <label for="customer_id">Customer:</label>
-            <select name="customer_id" id="customer_id" required>
-                <option value="">Select Customer</option>
-                <?php
-                while ($cust = mysqli_fetch_assoc($customers_result)) {
-                    $selected = ($cust['customer_id'] == $sale['customer_id']) ? "selected" : "";
-                    echo "<option value='" . $cust['customer_id'] . "' $selected>" . htmlspecialchars($cust['name']) . "</option>";
-                }
-                ?>
-            </select><br>
+    <div class="view py-4 px-4">
+        <?php
+        $ph_icon = 'fa-pen-to-square';
+        $ph_title = 'Edit Sale';
+        $ph_subtitle = 'Update sale details.';
+        $ph_back_link = 'view_sales.php';
+        $ph_back_label = 'Back to Sales';
+        include "../includes/page_header.php";
+        ?>
 
-            <label for="product_id">Product:</label>
-            <select name="product_id" id="product_id" required>
-                <option value="">Select Product</option>
-                <?php
-                while($prod=mysqli_fetch_assoc($products_result)){
-                    $selected = ($prod['product_id']==$sale_item['product_id']) ? "selected" : "";
-                    // Show effective stock: current stock + what THIS sale already holds (since it will be restored on save)
-                    $effective_stock = $prod['stock'] + ($prod['product_id'] == $sale_item['product_id'] ? $sale_item['quantity'] : 0);
-                    echo "<option value='".$prod['product_id']."' ".$selected.">".htmlspecialchars($prod['product_name'])." (Available: ".$effective_stock.")</option>";
-                }
-                ?>
-            </select><br>
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm rounded-3">
+                    <div class="card-body p-4 p-md-5">
+                        <form action="edit_sales.php" method="POST">
+                            <input type="hidden" name="sale_id" value="<?php echo $sale['sale_id']; ?>">
 
-            <label for="quantity">Quantity:</label>
-            <input
-            type="number"
-            name="quantity"
-            id="quantity"
-            min="1"
-            value="<?php echo $sale_item['quantity']; ?>"
-            required><br>
+                            <h6 class="text-uppercase text-muted fw-bold mb-3" style="font-size: 0.75rem; letter-spacing: 0.5px;">
+                                <i class="fa-solid fa-user me-1"></i> Customer &amp; Product
+                            </h6>
+                            <div class="mb-3">
+                                <label for="customer_id" class="form-label fw-semibold text-dark">Customer</label>
+                                <select name="customer_id" id="customer_id" class="form-select" required>
+                                    <option value="">Select Customer</option>
+                                    <?php
+                                    while ($cust = mysqli_fetch_assoc($customers_result)) {
+                                        $selected = ($cust['customer_id'] == $sale['customer_id']) ? "selected" : "";
+                                        echo "<option value='" . $cust['customer_id'] . "' $selected>" . htmlspecialchars($cust['name']) . "</option>";
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="product_id" class="form-label fw-semibold text-dark">Product</label>
+                                <select name="product_id" id="product_id" class="form-select" required>
+                                    <option value="">Select Product</option>
+                                    <?php
+                                    while($prod=mysqli_fetch_assoc($products_result)){
+                                        $selected = ($prod['product_id']==$sale_item['product_id']) ? "selected" : "";
+                                        // Show effective stock: current stock + what THIS sale already holds (since it will be restored on save)
+                                        $effective_stock = $prod['stock'] + ($prod['product_id'] == $sale_item['product_id'] ? $sale_item['quantity'] : 0);
+                                        echo "<option value='".$prod['product_id']."' ".$selected.">".htmlspecialchars($prod['product_name'])." (Available: ".$effective_stock.")</option>";
+                                    }
+                                    ?>
+                                </select>
+                            </div>
 
-            <!-- Sale Date -->
-            <label for="sale_date">Sale Date:</label>
-            <input type="date" id="sale_date" name="sale_date" value="<?php echo $sale['sale_date']; ?>" required><br>
+                            <h6 class="text-uppercase text-muted fw-bold mb-3 mt-4" style="font-size: 0.75rem; letter-spacing: 0.5px;">
+                                <i class="fa-solid fa-cart-shopping me-1"></i> Sale Details
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <label for="quantity" class="form-label fw-semibold text-dark">Quantity</label>
+                                    <input
+                                    type="number"
+                                    name="quantity"
+                                    id="quantity"
+                                    class="form-control"
+                                    min="1"
+                                    value="<?php echo $sale_item['quantity']; ?>"
+                                    required>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <label for="sale_date" class="form-label fw-semibold text-dark">Sale Date</label>
+                                    <input type="date" id="sale_date" name="sale_date" class="form-control" value="<?php echo $sale['sale_date']; ?>" required>
+                                </div>
+                            </div>
 
-            <button type="submit">Edit Sale</button>
-        </form>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-success flex-fill py-2 fw-semibold">
+                                    <i class="fa-solid fa-circle-check me-2"></i>Save Changes
+                                </button>
+                                <a href="view_sales.php" class="btn btn-outline-secondary py-2 px-4">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

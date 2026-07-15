@@ -1,5 +1,4 @@
 <?php
-include "../includes/header.php";
 include "../database/db.php";
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -12,6 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo "<script>alert('Please fill all the required fields');</script>";
     }
 }
+include "../includes/header.php";
 ?>
 
 <div class="admin-container">

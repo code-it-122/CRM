@@ -1,5 +1,4 @@
 <?php
-include "../includes/header.php";
 include "../database/db.php";
 
 // Handle POST request from add_attendance.php
@@ -26,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         die("Error marking attendance: " . mysqli_stmt_error($stmt));
     }
 }
-
+include "../includes/header.php";
 $sql = "SELECT a.attendance_id, e.name AS employee_name, a.attendance_date, a.status
         FROM attendance a
         JOIN employees e ON a.employee_id = e.employee_id
@@ -42,6 +41,7 @@ $total_records = mysqli_num_rows($result);
     } elseif ($_SESSION['role'] == 'hr') {
         include "../includes/hr_sidebar.php";
     }
+  
     ?>
 
     <div class="view py-4 px-4">

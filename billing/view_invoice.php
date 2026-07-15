@@ -1,5 +1,4 @@
 <?php
-include "../includes/header.php";
 include "../database/db.php";
 $sql = "SELECT i.invoice_id, i.sale_id, c.name AS customer_name, i.invoice_date, i.total_amount, i.payment_status, 
         GROUP_CONCAT(CONCAT(p.product_name, ' (x', si.quantity, ')') SEPARATOR ', ') AS products_list
@@ -12,6 +11,7 @@ $sql = "SELECT i.invoice_id, i.sale_id, c.name AS customer_name, i.invoice_date,
         ORDER BY i.invoice_id DESC";
 $result = mysqli_query($conn, $sql);
 $total_invoices = mysqli_num_rows($result);
+include "../includes/header.php";
 ?>
 
 <div class="admin-container">

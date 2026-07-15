@@ -117,7 +117,7 @@ $total_employees = mysqli_num_rows($result);
 
                             <div class="d-flex justify-content-between align-items-center border-top pt-3 mb-2">
                                 <small class="text-muted">Salary</small>
-                                <span class="fw-bold text-success">$<?php echo number_format($employee['salary'], 2); ?></span>
+                                <span class="fw-bold text-success">Rs<?php echo number_format($employee['salary'], 2); ?></span>
                             </div>
 
                             <div class="d-flex gap-2 pt-2 border-top">

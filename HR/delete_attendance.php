@@ -1,11 +1,7 @@
 <?php
 
-include "../database/db.php";
 
-if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'hr'])) {
-    header("Location: ../auth/login.php");
-    exit();
-}
+include "../database/db.php";
 
 if (isset($_GET['id'])) {
     $id = intval($_GET['id']);
@@ -22,8 +18,7 @@ if (isset($_GET['id'])) {
                   </script>";
             exit();
         } else {
-            echo "<script>alert('Error deleting attendance record.'); window.location.href='view_attendance.php';</script>";
-            exit();
+            die("Error deleting attendance: " . mysqli_stmt_error($stmt));
         }
     }
 } else {

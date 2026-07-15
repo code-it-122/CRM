@@ -1,11 +1,7 @@
 <?php
 
-include "../database/db.php";
 
-if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'hr'])) {
-    header("Location: ../auth/login.php");
-    exit();
-}
+include "../database/db.php";
 
 if (isset($_GET['id'])) {
     $id = intval($_GET['id']);
@@ -22,8 +18,7 @@ if (isset($_GET['id'])) {
                   </script>";
             exit();
         } else {
-            echo "<script>alert('This employee cannot be deleted because they have related attendance or leave records.'); window.location.href='view_employee.php';</script>";
-            exit();
+            die("Error deleting employee: " . mysqli_stmt_error($stmt));
         }
     }
 } else {

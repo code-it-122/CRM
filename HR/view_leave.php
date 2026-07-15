@@ -1,5 +1,4 @@
 <?php
-include "../includes/header.php";
 include "../database/db.php";
 
 // Handle POST request from add_leave.php
@@ -36,6 +35,7 @@ $sql = "SELECT l.leave_id, e.name AS employee_name, l.leave_type, l.from_date, l
         ORDER BY l.from_date DESC, l.leave_id DESC";
 $result = mysqli_query($conn, $sql);
 $total_records = mysqli_num_rows($result);
+include "../includes/header.php";
 ?>
 
 <div class="admin-container">

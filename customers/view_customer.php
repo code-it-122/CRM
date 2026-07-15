@@ -1,5 +1,4 @@
 <?php
-include "../includes/header.php";
 include "../database/db.php";
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -14,7 +13,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $result = mysqli_stmt_execute($stmt);
 
     if ($result) {
-        echo "<script>alert('Customer added successfully');</script>";
         header("Location: view_customer.php");
         exit();
     } else {
@@ -25,6 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 $sql = "SELECT * FROM customers ORDER BY customer_id DESC";
 $result = mysqli_query($conn, $sql);
 $total_customers = mysqli_num_rows($result);
+ include "../includes/header.php";
 ?>
 
 <div class="admin-container">

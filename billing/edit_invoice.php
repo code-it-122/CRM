@@ -77,7 +77,7 @@ include "../includes/header.php";
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-semibold text-dark">Total Amount</label>
-                                <input type="text" class="form-control" value="$<?php echo number_format($invoice['total_amount'], 2); ?>" disabled>
+                                <input type="text" class="form-control" value="Rs <?php echo number_format($invoice['total_amount'], 2); ?>" disabled>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-semibold text-dark">Included Products &amp; Quantity</label>

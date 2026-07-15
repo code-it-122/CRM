@@ -1,11 +1,5 @@
 <?php
- include "../includes/header.php";
  include "../database/db.php";
-
- if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-     header("Location: ../auth/login.php");
-     exit();
- }
 
  if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $username = $_POST['username'];
@@ -14,33 +8,24 @@
     $role = $_POST['role'];
     $status = $_POST['status'];
 
-    // Prevent duplicate email with a friendly message instead of a raw SQL error
-    $check = mysqli_prepare($conn, "SELECT user_id FROM users WHERE email = ?");
-    mysqli_stmt_bind_param($check, "s", $email);
-    mysqli_stmt_execute($check);
-    mysqli_stmt_store_result($check);
+    $sql="insert into users (name,email,password,role,status) values(?,?,?,?,?)";
+    $stmt=mysqli_prepare($conn,$sql);
+    mysqli_stmt_bind_param($stmt, "sssss", $username, $email, $password, $role, $status);
+    $result=mysqli_stmt_execute($stmt);
 
-    if (mysqli_stmt_num_rows($check) > 0) {
-        echo "<script>alert('A user with this email already exists.');</script>";
+    if($result){
+        header("Location: view_user.php");
+        exit();
     } else {
-        $sql="insert into users (name,email,password,role,status) values(?,?,?,?,?)";
-        $stmt=mysqli_prepare($conn,$sql);
-        mysqli_stmt_bind_param($stmt, "sssss", $username, $email, $password, $role, $status);
-        $result=mysqli_stmt_execute($stmt);
-
-        if($result){
-            echo "<script>alert('User added successfully');</script>";
-            header("Location: view_user.php");
-            exit();
-        } else {
-            echo "<script>alert('Error adding user. Please try again.');</script>";
-        }
+        die("Error: " . mysqli_stmt_error($stmt));
     }
+
  }
 
  $sql="SELECT * FROM users";
  $result=mysqli_query($conn,$sql);
  $total_users = mysqli_num_rows($result);
+  include "../includes/header.php";
 ?>
 
 <div class="admin-container">
@@ -92,7 +77,7 @@
                                 </div>
                             </td>
                             <td><span class="text-muted"><?php echo htmlspecialchars($user['email']); ?></span></td>
-                            <td><span class="fw-bold text-dark text-capitalize"><?php echo htmlspecialchars($user['role']); ?></span></td>
+                            <td><span class="fw-bold text-dark"><?php echo htmlspecialchars($user['role']); ?></span></td>
                             <td>
                                 <span class="badge <?php echo $badge; ?> rounded-pill px-2 py-1">
                                     <i class="fa-solid <?php echo $icon; ?> me-1"></i><?php echo $label; ?>

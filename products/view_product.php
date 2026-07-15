@@ -1,5 +1,4 @@
 <?php
-include "../includes/header.php";
 include "../database/db.php";
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -26,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 $sql = "SELECT * FROM products ORDER BY product_id DESC";
 $result = mysqli_query($conn, $sql);
 $total_products = mysqli_num_rows($result);
+include "../includes/header.php";
 ?>
 
 <div class="admin-container">

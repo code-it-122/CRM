@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function() {
             labels: <?php echo json_encode($chart_months); ?>,
             datasets: [
                 {
-                    label: 'Revenue ($)',
+                    label: 'Revenue (Rs)',
                     data: <?php echo json_encode($chart_revenues); ?>,
                     borderColor: '#198754',
                     backgroundColor: 'rgba(25, 135, 84, 0.05)',
